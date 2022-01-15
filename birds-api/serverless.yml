@@ -30,6 +30,17 @@ functions:
       - httpApi:
           path: /birds
           method: get
-
+  get-bird-videos:
+    handler: handler.get_bird_videos
+    events:
+      - httpApi:
+          path: /birds/{species}
+          method: get
+  get-video:
+    handler: handler.get_video
+    events:
+      - httpApi:
+          path: /videos/{video}
+          method: get
 plugins:
   - serverless-python-requirements
