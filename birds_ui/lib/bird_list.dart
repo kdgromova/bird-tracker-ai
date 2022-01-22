@@ -22,6 +22,7 @@ class BirdList extends StatelessWidget {
             ),
       ),
       body: ListView.separated(
+        padding: const EdgeInsets.all(16.0),
         itemCount: _birds.length,
         itemBuilder: _listViewItemBuilder,
         separatorBuilder: (context, index) {
@@ -34,12 +35,12 @@ class BirdList extends StatelessWidget {
   Widget _listViewItemBuilder(BuildContext context, int index) {
     var bird = _birds[index];
     return ListTile(
-      contentPadding: EdgeInsets.all(10),
       // leading: _itemThumbnail(location),
       title: _itemTitle(bird),
       subtitle: _itemSubtitle(bird),
       trailing: Chip(
-          label: Text(bird.counter.toString()),
+          label: Text(bird.counter.toString(),
+              style: TextStyle(color: Colors.white)),
           backgroundColor: Theme.of(context).colorScheme.secondary),
       onTap: () => _navigationToBirdDetail(context, _birds[index].birdName),
     );
