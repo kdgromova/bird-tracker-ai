@@ -127,3 +127,15 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+#my stuff
+node_modules/
+data/
+na_dataset/
+birds_dataset/
+birds_dataset_short/
+/models/
+.idea
+.DS_Store
+.vs_code/
