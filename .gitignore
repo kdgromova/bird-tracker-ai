@@ -138,4 +138,4 @@ birds_dataset_short/
 /models/
 .idea
 .DS_Store
-.vs_code/
+.vscode/
