@@ -1,4 +1,6 @@
-import 'package:birds_ui/models/video_short.dart';
+import 'package:birds_ui/mocks/mock_video.dart';
+import 'package:birds_ui/models/bird_video.dart';
+import 'package:birds_ui/video_detail.dart';
 import 'package:flutter/material.dart';
 import 'models/bird.dart';
 import 'package:intl/intl.dart';
@@ -23,11 +25,10 @@ class BirdDetail extends StatelessWidget {
     result.add(_bannerImage(bird.imageUrl, 250.0));
     result.add(_renderDescription(bird.description));
     result.add(_renderVideos(context, bird.videos));
-    // result.addAll(_renderFacts(context, location));
     return result;
   }
 
-  Widget _renderVideos(BuildContext context, List<VideoShort> videos) {
+  Widget _renderVideos(BuildContext context, List<BirdVideo> videos) {
     return Expanded(
         child: ListView.separated(
       padding: const EdgeInsets.fromLTRB(0, 16.0, 16.0, 16.0),
@@ -43,24 +44,25 @@ class BirdDetail extends StatelessWidget {
     var video = bird.videos[index];
     final alreadySaved = false;
     return ListTile(
-        leading: Container(
-            child: Icon(Icons.play_arrow, size: 40.0, color: Colors.black),
-            height: double.infinity),
-        title: Text("Video"),
-        subtitle: _itemSubtitle(video),
-        trailing: Container(
-            child: Icon(
-              alreadySaved ? Icons.favorite : Icons.favorite_border,
-              color: alreadySaved ? Colors.red : null,
-              semanticLabel: alreadySaved ? 'Remove from saved' : 'Save',
-              size: 30.0,
-            ),
-            height: double.infinity)
-        // onTap: () => _navigationToBirdDetail(context, _birds[index].birdName),
-        );
+      leading: Container(
+          child: const Icon(Icons.play_arrow, size: 40.0, color: Colors.black),
+          height: double.infinity),
+      title: const Text("Video"),
+      subtitle: _itemSubtitle(video),
+      trailing: Container(
+          child: Icon(
+            alreadySaved ? Icons.favorite : Icons.favorite_border,
+            color: alreadySaved ? Colors.red : null,
+            semanticLabel: alreadySaved ? 'Remove from saved' : 'Save',
+            size: 30.0,
+          ),
+          height: double.infinity),
+      onTap: () =>
+          _navigationToVideoDetail(context, bird.videos[index].filename),
+    );
   }
 
-  Widget _itemSubtitle(VideoShort video) {
+  Widget _itemSubtitle(BirdVideo video) {
     final DateFormat formatter = DateFormat.yMd().add_jm();
     final createdAt = formatter.format(video.createdAt);
     return Container(
@@ -70,31 +72,18 @@ class BirdDetail extends StatelessWidget {
           Text("Created: " + createdAt)
         ]));
   }
-  // Widget _sectionTitle(String text) {
-  //   return Container(
-  //       padding: EdgeInsets.fromLTRB(25.0, 25.0, 25.0, 10.0),
-  //       child:
-  //           Text(text, textAlign: TextAlign.left, style: Styles.headerLarge));
-  // }
-
-  // Widget _sectionText(String text) {
-  //   return Container(
-  //       padding: EdgeInsets.fromLTRB(25.0, 15.0, 25.0, 15.0),
-  //       child: Text(text, style: Styles.textDefault));
-  // }
 
   Widget _renderDescription(String description) {
     return Container(
-      // constraints: BoxConstraints.tightFor(height: height),
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
             padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
-            child: Text("About",
+            child: const Text("About",
                 textAlign: TextAlign.left, style: TextStyle(fontSize: 25))),
         Text(
           description,
-          style: TextStyle(height: 1.5, fontSize: 14),
+          style: const TextStyle(height: 1.5, fontSize: 14),
           textAlign: TextAlign.justify,
         )
       ]),
@@ -106,5 +95,11 @@ class BirdDetail extends StatelessWidget {
       constraints: BoxConstraints.tightFor(height: height),
       child: Image.network(url, fit: BoxFit.fitWidth),
     );
+  }
+
+  void _navigationToVideoDetail(BuildContext context, String filename) {
+    final video = VideoMock.fetchOne(filename);
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => VideoDetail(video)));
   }
 }
