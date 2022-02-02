@@ -1,48 +1,103 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 // import 'location_detail.dart';
 // import 'styles.dart';
 import 'models/bird_short.dart';
 import 'package:intl/intl.dart';
-import 'package:badges/badges.dart';
-import 'models/bird.dart';
 import 'mocks/mock_bird.dart';
 import 'bird_detail.dart';
 
-class BirdList extends StatelessWidget {
-  final List<BirdShort> _birds;
+class BirdList extends StatefulWidget {
+  const BirdList({Key? key}) : super(key: key);
 
-  BirdList(this._birds);
+  @override
+  createState() => _BirdListState();
+}
+
+class _BirdListState extends State<BirdList> {
+  Future<List<BirdShort>> _birdsFuture = BirdShort.fetchAll();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Birds'
-            // style: Styles.navBarTitle,
-            ),
-      ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: _birds.length,
-        itemBuilder: _listViewItemBuilder,
-        separatorBuilder: (context, index) {
-          return const Divider();
-        },
-      ),
-    );
+        appBar: AppBar(
+          title: const Text('My Birds'),
+        ),
+        body: RefreshIndicator(
+          onRefresh: _refreshData,
+          child: FutureBuilder<List<BirdShort>>(
+            future: _birdsFuture,
+            builder: (BuildContext context,
+                AsyncSnapshot<List<BirdShort>> snapshot) {
+              if (snapshot.hasData) {
+                var birds = snapshot.data!;
+                return _renderListView(birds);
+              } else if (snapshot.hasError) {
+                return _renderError(snapshot);
+              } else {
+                return _renderLoader();
+              }
+            },
+          ),
+        ));
   }
 
-  Widget _listViewItemBuilder(BuildContext context, int index) {
-    var bird = _birds[index];
-    return ListTile(
-      // leading: _itemThumbnail(location),
-      title: _itemTitle(bird),
-      subtitle: _itemSubtitle(bird),
-      trailing: Chip(
-          label: Text(bird.counter.toString(),
-              style: TextStyle(color: Colors.white)),
-          backgroundColor: Theme.of(context).colorScheme.secondary),
-      onTap: () => _navigationToBirdDetail(context, _birds[index].birdName),
+  Future<void> _refreshData() async {
+    _birdsFuture = BirdShort.fetchAll();
+    setState(() => {});
+  }
+
+  Widget _renderLoader() {
+    return Container(
+        padding: const EdgeInsets.all(20),
+        child: Center(
+            child: Column(children: const [
+          SizedBox(
+            width: 60,
+            height: 60,
+            child: CircularProgressIndicator(),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text('Awaiting result...'),
+          )
+        ])));
+  }
+
+  Column _renderError(AsyncSnapshot<List<BirdShort>> snapshot) {
+    return Column(children: [
+      const Icon(
+        Icons.error_outline,
+        color: Colors.red,
+        size: 60,
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 16),
+        child: Text('Error: ${snapshot.error}'),
+      )
+    ]);
+  }
+
+  ListView _renderListView(List<BirdShort> birds) {
+    return ListView.separated(
+      padding: const EdgeInsets.all(16.0),
+      itemCount: birds.length,
+      itemBuilder: (BuildContext context, int index) {
+        var bird = birds[index];
+        return ListTile(
+          // leading: _itemThumbnail(location),
+          title: _itemTitle(bird),
+          subtitle: _itemSubtitle(bird),
+          trailing: Chip(
+              label: Text(bird.counter.toString(),
+                  style: const TextStyle(color: Colors.white)),
+              backgroundColor: Theme.of(context).colorScheme.secondary),
+          onTap: () => _navigationToBirdDetail(context, bird.birdName),
+        );
+      },
+      separatorBuilder: (context, index) {
+        return const Divider();
+      },
     );
   }
 
@@ -64,10 +119,6 @@ class BirdList extends StatelessWidget {
 
   Widget _itemTitle(BirdShort bird) {
     return Text(bird.birdName);
-    // return Badge(
-    //   badgeContent: Text('3'),
-    //   child: Icon(Icons.settings),
-    // );
   }
 
   Widget _itemSubtitle(BirdShort bird) {
