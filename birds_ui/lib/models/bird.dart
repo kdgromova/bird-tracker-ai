@@ -10,13 +10,14 @@ class Bird {
 
   Bird(this.birdName, this.description, this.imageUrl, this.videos);
 
-  factory Bird.fromJson(List<dynamic> json) {
-    Map<String, dynamic> stats = json[0];
+  factory Bird.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic> stats = json['stats'];
     String birdName = stats['PK'].split("#")[1];
     String? description = stats['description'];
     String? url = stats['imageUrl'];
-    List<BirdVideo> videos =
-        json.sublist(1).map((item) => BirdVideo.fromJson(item)).toList();
+    List<BirdVideo> videos = (json['videos'] as List)
+        .map((item) => BirdVideo.fromJson(item))
+        .toList();
     return Bird(birdName, description, url, videos);
   }
 
@@ -28,7 +29,8 @@ class Bird {
     if (resp.statusCode != 200) {
       throw (resp.body);
     }
-    List<dynamic> birdVideos = json.decode(resp.body)['videos'];
-    return Bird.fromJson(birdVideos);
+
+    Map<String, dynamic> birdVideosMap = json.decode(resp.body);
+    return Bird.fromJson(birdVideosMap);
   }
 }
