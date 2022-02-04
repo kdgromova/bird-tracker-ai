@@ -102,9 +102,8 @@ class _BirdListState extends State<BirdList> {
   }
 
   void _navigationToBirdDetail(BuildContext context, String birdName) {
-    final bird = BirdMock.fetchOne(birdName);
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => BirdDetail(bird)));
+        context, MaterialPageRoute(builder: (context) => BirdDetail(birdName)));
   }
 
   // Widget _itemThumbnail(Location location) {

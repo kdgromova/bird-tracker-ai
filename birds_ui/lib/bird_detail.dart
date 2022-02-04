@@ -5,27 +5,92 @@ import 'package:flutter/material.dart';
 import 'models/bird.dart';
 import 'package:intl/intl.dart';
 
-class BirdDetail extends StatelessWidget {
-  final Bird bird;
+class BirdDetail extends StatefulWidget {
+  final String birdName;
 
-  BirdDetail(this.bird);
+  BirdDetail(this.birdName);
+
+  @override
+  createState() => _BirdDetailState(this.birdName);
+}
+
+class _BirdDetailState extends State<BirdDetail> {
+  final String birdName;
+  Future<Bird> _birdFuture;
+
+  _BirdDetailState(this.birdName) : _birdFuture = Bird.fetchOne(birdName);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(bird.birdName)),
-        body: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: _renderBody(context, bird)));
+        appBar: AppBar(title: Text(birdName)),
+        body: RefreshIndicator(
+          onRefresh: _refreshData,
+          child: FutureBuilder<Bird>(
+            future: _birdFuture,
+            builder: (BuildContext context, AsyncSnapshot<Bird> snapshot) {
+              if (snapshot.hasData) {
+                var bird = snapshot.data!;
+                return _renderBody(context, bird);
+              } else if (snapshot.hasError) {
+                return _renderError(snapshot);
+              } else {
+                return _renderLoader();
+              }
+            },
+          ),
+        ));
   }
 
-  List<Widget> _renderBody(BuildContext context, Bird bird) {
+  Future<void> _refreshData() async {
+    _birdFuture = Bird.fetchOne(birdName);
+    setState(() => {});
+  }
+
+  Widget _renderLoader() {
+    return Container(
+        padding: const EdgeInsets.all(20),
+        child: Center(
+            child: Column(children: const [
+          SizedBox(
+            width: 60,
+            height: 60,
+            child: CircularProgressIndicator(),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text('Awaiting result...'),
+          )
+        ])));
+  }
+
+  Column _renderError(AsyncSnapshot<Bird> snapshot) {
+    return Column(children: [
+      const Icon(
+        Icons.error_outline,
+        color: Colors.red,
+        size: 60,
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 16),
+        child: Text('Error: ${snapshot.error}'),
+      )
+    ]);
+  }
+
+  Widget _renderBody(BuildContext context, Bird bird) {
     var result = <Widget>[];
-    result.add(_bannerImage(bird.imageUrl, 250.0));
-    result.add(_renderDescription(bird.description));
+    if (bird.imageUrl != null) {
+      result.add(_bannerImage(bird.imageUrl!, 250.0));
+    }
+    if (bird.description != null) {
+      result.add(_renderDescription(bird.description!));
+    }
     result.add(_renderVideos(context, bird.videos));
-    return result;
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: result);
   }
 
   Widget _renderVideos(BuildContext context, List<BirdVideo> videos) {
@@ -33,33 +98,32 @@ class BirdDetail extends StatelessWidget {
         child: ListView.separated(
       padding: const EdgeInsets.fromLTRB(0, 16.0, 16.0, 16.0),
       itemCount: videos.length,
-      itemBuilder: _listViewItemBuilder,
+      itemBuilder: (BuildContext context, int index) {
+        var video = videos[index];
+        final alreadySaved = false;
+        return ListTile(
+          leading: Container(
+              child:
+                  const Icon(Icons.play_arrow, size: 40.0, color: Colors.black),
+              height: double.infinity),
+          title: const Text("Video"),
+          subtitle: _itemSubtitle(video),
+          trailing: Container(
+              child: Icon(
+                alreadySaved ? Icons.favorite : Icons.favorite_border,
+                color: alreadySaved ? Colors.red : null,
+                semanticLabel: alreadySaved ? 'Remove from saved' : 'Save',
+                size: 30.0,
+              ),
+              height: double.infinity),
+          onTap: () =>
+              _navigationToVideoDetail(context, videos[index].filename),
+        );
+      },
       separatorBuilder: (context, index) {
         return const Divider();
       },
     ));
-  }
-
-  Widget _listViewItemBuilder(BuildContext context, int index) {
-    var video = bird.videos[index];
-    final alreadySaved = false;
-    return ListTile(
-      leading: Container(
-          child: const Icon(Icons.play_arrow, size: 40.0, color: Colors.black),
-          height: double.infinity),
-      title: const Text("Video"),
-      subtitle: _itemSubtitle(video),
-      trailing: Container(
-          child: Icon(
-            alreadySaved ? Icons.favorite : Icons.favorite_border,
-            color: alreadySaved ? Colors.red : null,
-            semanticLabel: alreadySaved ? 'Remove from saved' : 'Save',
-            size: 30.0,
-          ),
-          height: double.infinity),
-      onTap: () =>
-          _navigationToVideoDetail(context, bird.videos[index].filename),
-    );
   }
 
   Widget _itemSubtitle(BirdVideo video) {
