@@ -1,26 +1,76 @@
+import 'package:birds_ui/bird_detail.dart';
 import 'package:birds_ui/models/bird_video.dart';
 import 'package:birds_ui/models/video.dart';
 import 'package:birds_ui/video_player.dart';
 import 'package:flutter/material.dart';
-import 'models/bird.dart';
 import 'package:intl/intl.dart';
 
-class VideoDetail extends StatelessWidget {
-  final Video video;
+class VideoDetail extends StatefulWidget {
+  final String filename;
 
-  VideoDetail(this.video);
+  VideoDetail(this.filename);
+
+  @override
+  createState() => _VideoDetailState(this.filename);
+}
+
+class _VideoDetailState extends State<VideoDetail> {
+  final String filename;
+  Future<Video> _videoFuture;
+
+  _VideoDetailState(this.filename) : _videoFuture = Video.fetchOne(filename);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: const Text("Video")),
-        body: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: _renderBody(context, video)));
+        body: FutureBuilder<Video>(
+          future: _videoFuture,
+          builder: (BuildContext context, AsyncSnapshot<Video> snapshot) {
+            if (snapshot.hasData) {
+              var bird = snapshot.data!;
+              return _renderBody(context, bird);
+            } else if (snapshot.hasError) {
+              return _renderError(snapshot);
+            } else {
+              return _renderLoader();
+            }
+          },
+        ));
   }
 
-  List<Widget> _renderBody(BuildContext context, Video video) {
+  Widget _renderLoader() {
+    return Container(
+        padding: const EdgeInsets.all(20),
+        child: Center(
+            child: Column(children: const [
+          SizedBox(
+            width: 60,
+            height: 60,
+            child: CircularProgressIndicator(),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text('Awaiting result...'),
+          )
+        ])));
+  }
+
+  Column _renderError(AsyncSnapshot<Video> snapshot) {
+    return Column(children: [
+      const Icon(
+        Icons.error_outline,
+        color: Colors.red,
+        size: 60,
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 16),
+        child: Text('Error: ${snapshot.error}'),
+      )
+    ]);
+  }
+
+  Widget _renderBody(BuildContext context, Video video) {
     var result = <Widget>[];
     result.add(_bannerVideo(video.url, 250.0));
     result.add(Container(
@@ -30,7 +80,10 @@ class VideoDetail extends StatelessWidget {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
         )));
     result.add(_renderBirds(context, video));
-    return result;
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: result);
   }
 
   Widget _renderBirds(BuildContext context, Video video) {
@@ -38,20 +91,21 @@ class VideoDetail extends StatelessWidget {
         child: ListView.separated(
       padding: const EdgeInsets.fromLTRB(0, 16.0, 16.0, 16.0),
       itemCount: video.birdVideos.length,
-      itemBuilder: _listViewItemBuilder,
+      itemBuilder: (BuildContext context, int index) {
+        var birdVideo = video.birdVideos[index];
+        return ListTile(
+          title: Text(birdVideo.birdName),
+          subtitle: _itemSubtitle(birdVideo),
+          onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BirdDetail(birdVideo.birdName))),
+        );
+      },
       separatorBuilder: (context, index) {
         return const Divider();
       },
     ));
-  }
-
-  Widget _listViewItemBuilder(BuildContext context, int index) {
-    var birdVideo = video.birdVideos[index];
-    return ListTile(
-      title: Text(birdVideo.birdName),
-      subtitle: _itemSubtitle(birdVideo),
-      // onTap: () => _navigationToBirdDetail(context, _birds[index].birdName),
-    );
   }
 
   Widget _itemSubtitle(BirdVideo birdVideo) {
@@ -66,24 +120,7 @@ class VideoDetail extends StatelessWidget {
         ]));
   }
 
-  // Widget _renderDescription(String description) {
-  //   return Container(
-  //     padding: const EdgeInsets.all(16),
-  //     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-  //       Container(
-  //           padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
-  //           child: const Text("About",
-  //               textAlign: TextAlign.left, style: TextStyle(fontSize: 25))),
-  //       Text(
-  //         description,
-  //         style: const TextStyle(height: 1.5, fontSize: 14),
-  //         textAlign: TextAlign.justify,
-  //       )
-  //     ]),
-  //   );
-  // }
-
   Widget _bannerVideo(String url, double height) {
-    return VideoPlayer(url: video.url);
+    return VideoPlayer(url: url);
   }
 }

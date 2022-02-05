@@ -162,8 +162,7 @@ class _BirdDetailState extends State<BirdDetail> {
   }
 
   void _navigationToVideoDetail(BuildContext context, String filename) {
-    final video = VideoMock.fetchOne(filename);
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => VideoDetail(video)));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => VideoDetail(filename)));
   }
 }
