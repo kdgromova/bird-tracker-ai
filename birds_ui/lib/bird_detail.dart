@@ -1,6 +1,7 @@
 import 'package:birds_ui/mocks/mock_video.dart';
 import 'package:birds_ui/models/bird_video.dart';
 import 'package:birds_ui/video_detail.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'models/bird.dart';
 import 'package:intl/intl.dart';
@@ -96,7 +97,7 @@ class _BirdDetailState extends State<BirdDetail> {
   Widget _renderVideos(BuildContext context, List<BirdVideo> videos) {
     return Expanded(
         child: ListView.separated(
-      padding: const EdgeInsets.fromLTRB(0, 16.0, 16.0, 16.0),
+      padding: const EdgeInsets.fromLTRB(0, 0, 16.0, 16.0),
       itemCount: videos.length,
       itemBuilder: (BuildContext context, int index) {
         var video = videos[index];
@@ -139,19 +140,20 @@ class _BirdDetailState extends State<BirdDetail> {
 
   Widget _renderDescription(String description) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-            padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
-            child: const Text("About",
-                textAlign: TextAlign.left, style: TextStyle(fontSize: 25))),
-        Text(
-          description,
-          style: const TextStyle(height: 1.5, fontSize: 14),
-          textAlign: TextAlign.justify,
-        )
-      ]),
-    );
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: ExpandablePanel(
+          header: Container(
+              child: const Text("About",
+                  textAlign: TextAlign.left, style: TextStyle(fontSize: 25))),
+          collapsed: Text(""),
+          expanded: Container(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+              child: Text(
+                description,
+                style: const TextStyle(height: 1.5, fontSize: 14),
+                textAlign: TextAlign.justify,
+              )),
+        ));
   }
 
   Widget _bannerImage(String url, double height) {
