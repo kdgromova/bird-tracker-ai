@@ -72,7 +72,7 @@ class _VideoDetailState extends State<VideoDetail> {
 
   Widget _renderBody(BuildContext context, Video video) {
     var result = <Widget>[];
-    result.add(_bannerVideo(video.url, 250.0));
+    result.add(_bannerVideo(video.url));
     result.add(Container(
         padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
         child: const Text(
@@ -80,32 +80,32 @@ class _VideoDetailState extends State<VideoDetail> {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
         )));
     result.add(_renderBirds(context, video));
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: result);
+    return SingleChildScrollView(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: result));
   }
 
   Widget _renderBirds(BuildContext context, Video video) {
-    return Expanded(
-        child: ListView.separated(
-      padding: const EdgeInsets.fromLTRB(0, 16.0, 16.0, 16.0),
-      itemCount: video.birdVideos.length,
-      itemBuilder: (BuildContext context, int index) {
-        var birdVideo = video.birdVideos[index];
-        return ListTile(
-          title: Text(birdVideo.birdName),
-          subtitle: _itemSubtitle(birdVideo),
-          onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => BirdDetail(birdVideo.birdName))),
-        );
-      },
-      separatorBuilder: (context, index) {
-        return const Divider();
-      },
-    ));
+    return ListView.separated(
+        shrinkWrap: true,
+        padding: const EdgeInsets.fromLTRB(0, 16.0, 16.0, 16.0),
+        itemCount: video.birdVideos.length,
+        itemBuilder: (BuildContext context, int index) {
+          var birdVideo = video.birdVideos[index];
+          return ListTile(
+            title: Text(birdVideo.birdName),
+            subtitle: _itemSubtitle(birdVideo),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => BirdDetail(birdVideo.birdName))),
+          );
+        },
+        separatorBuilder: (context, index) {
+          return const Divider();
+        });
   }
 
   Widget _itemSubtitle(BirdVideo birdVideo) {
@@ -120,7 +120,7 @@ class _VideoDetailState extends State<VideoDetail> {
         ]));
   }
 
-  Widget _bannerVideo(String url, double height) {
+  Widget _bannerVideo(String url) {
     return VideoPlayer(url: url);
   }
 }

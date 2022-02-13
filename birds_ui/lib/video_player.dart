@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -31,11 +32,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
     // Initialize the controller and store the Future for later use.
     _initializeVideoPlayerFuture = _controller.initialize();
 
-    _chewieController = ChewieController(
-      videoPlayerController: _controller,
-      // autoPlay: true,
-      // looping: true,
-    );
+    _chewieController = ChewieController(videoPlayerController: _controller,
+        // FIXME this options locks orientation to portraing after exiting full screen mode
+        deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp]);
   }
 
   @override
