@@ -27,19 +27,24 @@ class _BirdDetailState extends State<BirdDetail> {
         appBar: AppBar(title: Text(birdName)),
         body: RefreshIndicator(
           onRefresh: _refreshData,
-          child: FutureBuilder<Bird>(
-            future: _birdFuture,
-            builder: (BuildContext context, AsyncSnapshot<Bird> snapshot) {
-              if (snapshot.hasData) {
-                var bird = snapshot.data!;
-                return _renderBody(context, bird);
-              } else if (snapshot.hasError) {
-                return _renderError(snapshot);
-              } else {
-                return _renderLoader();
-              }
-            },
-          ),
+          child: Center(
+              child: Container(
+                  alignment: Alignment.center,
+                  constraints: const BoxConstraints(maxWidth: 700),
+                  child: FutureBuilder<Bird>(
+                    future: _birdFuture,
+                    builder:
+                        (BuildContext context, AsyncSnapshot<Bird> snapshot) {
+                      if (snapshot.hasData) {
+                        var bird = snapshot.data!;
+                        return _renderBody(context, bird);
+                      } else if (snapshot.hasError) {
+                        return _renderError(snapshot);
+                      } else {
+                        return _renderLoader();
+                      }
+                    },
+                  ))),
         ));
   }
 

@@ -4,7 +4,6 @@ import 'dart:async';
 // import 'styles.dart';
 import 'models/bird_short.dart';
 import 'package:intl/intl.dart';
-import 'mocks/mock_bird.dart';
 import 'bird_detail.dart';
 
 class BirdList extends StatefulWidget {
@@ -25,20 +24,24 @@ class _BirdListState extends State<BirdList> {
         ),
         body: RefreshIndicator(
           onRefresh: _refreshData,
-          child: FutureBuilder<List<BirdShort>>(
-            future: _birdsFuture,
-            builder: (BuildContext context,
-                AsyncSnapshot<List<BirdShort>> snapshot) {
-              if (snapshot.hasData) {
-                var birds = snapshot.data!;
-                return _renderListView(birds);
-              } else if (snapshot.hasError) {
-                return _renderError(snapshot);
-              } else {
-                return _renderLoader();
-              }
-            },
-          ),
+          child: Center(
+              child: Container(
+                  alignment: Alignment.center,
+                  constraints: const BoxConstraints(maxWidth: 700),
+                  child: FutureBuilder<List<BirdShort>>(
+                    future: _birdsFuture,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<BirdShort>> snapshot) {
+                      if (snapshot.hasData) {
+                        var birds = snapshot.data!;
+                        return _renderListView(birds);
+                      } else if (snapshot.hasError) {
+                        return _renderError(snapshot);
+                      } else {
+                        return _renderLoader();
+                      }
+                    },
+                  ))),
         ));
   }
 
