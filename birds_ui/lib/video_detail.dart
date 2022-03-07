@@ -1,9 +1,9 @@
-import 'package:birds_ui/bird_detail.dart';
 import 'package:birds_ui/models/bird_video.dart';
 import 'package:birds_ui/models/video.dart';
 import 'package:birds_ui/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:beamer/beamer.dart';
 
 class VideoDetail extends StatefulWidget {
   final String filename;
@@ -95,13 +95,9 @@ class _VideoDetailState extends State<VideoDetail> {
         itemBuilder: (BuildContext context, int index) {
           var birdVideo = video.birdVideos[index];
           return ListTile(
-            title: Text(birdVideo.birdName),
-            subtitle: _itemSubtitle(birdVideo),
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => BirdDetail(birdVideo.birdName))),
-          );
+              title: Text(birdVideo.birdName),
+              subtitle: _itemSubtitle(birdVideo),
+              onTap: () => context.beamToNamed('/birds/${birdVideo.birdName}'));
         },
         separatorBuilder: (context, index) {
           return const Divider();

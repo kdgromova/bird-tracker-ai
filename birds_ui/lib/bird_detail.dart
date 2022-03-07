@@ -1,7 +1,5 @@
 import 'package:beamer/beamer.dart';
-import 'package:birds_ui/mocks/mock_video.dart';
 import 'package:birds_ui/models/bird_video.dart';
-import 'package:birds_ui/video_detail.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'models/bird.dart';

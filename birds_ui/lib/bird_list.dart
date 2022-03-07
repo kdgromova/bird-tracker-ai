@@ -1,11 +1,8 @@
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-// import 'location_detail.dart';
-// import 'styles.dart';
 import 'models/bird_short.dart';
 import 'package:intl/intl.dart';
-import 'bird_detail.dart';
 
 class BirdList extends StatefulWidget {
   const BirdList({Key? key}) : super(key: key);
