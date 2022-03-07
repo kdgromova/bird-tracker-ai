@@ -1,3 +1,4 @@
+import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 // import 'location_detail.dart';
@@ -105,8 +106,7 @@ class _BirdListState extends State<BirdList> {
   }
 
   void _navigationToBirdDetail(BuildContext context, String birdName) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => BirdDetail(birdName)));
+    context.beamToNamed("/birds/$birdName");
   }
 
   // Widget _itemThumbnail(Location location) {

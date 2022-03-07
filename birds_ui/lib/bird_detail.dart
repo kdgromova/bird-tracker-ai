@@ -1,3 +1,4 @@
+import 'package:beamer/beamer.dart';
 import 'package:birds_ui/mocks/mock_video.dart';
 import 'package:birds_ui/models/bird_video.dart';
 import 'package:birds_ui/video_detail.dart';
@@ -169,7 +170,7 @@ class _BirdDetailState extends State<BirdDetail> {
   }
 
   void _navigationToVideoDetail(BuildContext context, String filename) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => VideoDetail(filename)));
+    String urlSafeFilename = filename.replaceAll('/', '_');
+    Beamer.of(context).beamToNamed("/birds/$birdName/$urlSafeFilename");
   }
 }

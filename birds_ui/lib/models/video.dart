@@ -16,8 +16,7 @@ class Video {
     return Video(filename, videos);
   }
 
-  static Future<Video> fetchOne(String filename) async {
-    String urlSafeFilename = filename.replaceAll('/', '_');
+  static Future<Video> fetchOne(String urlSafeFilename) async {
     var uri = Uri.parse(
         'https://qc9afhnyli.execute-api.us-east-1.amazonaws.com/videos/$urlSafeFilename');
     final resp = await http.get(uri);
@@ -27,6 +26,7 @@ class Video {
     }
 
     List birdVideos = json.decode(resp.body)['birds'];
+    String filename = urlSafeFilename.replaceAll('_', '/');
     return Video.fromJson(filename, birdVideos);
   }
 }
