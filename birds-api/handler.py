@@ -14,7 +14,14 @@ def get_birds(event, context):
         "birds": items,
     }
 
-    response = {"statusCode": 200, "body": json.dumps(body)}
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        "headers": {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': True,
+        },
+    }
 
     return response
 
@@ -39,7 +46,14 @@ def get_bird_videos(event, context):
         "stats": stats
     }
     
-    response = {"statusCode": 200, "body": json.dumps(body)}
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        "headers": {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': True,
+        },
+    }
     return response
 
 def get_video(event, context):
@@ -55,5 +69,12 @@ def get_video(event, context):
         "birds": items,
     }
     
-    response = {"statusCode": 200, "body": json.dumps(body)}
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body),
+        "headers": {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': True,
+        },
+    }
     return response
